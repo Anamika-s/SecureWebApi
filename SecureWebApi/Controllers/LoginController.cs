@@ -63,16 +63,20 @@ namespace SecureWebApi.Controllers
 
         private string GenerateJSONWebToken(User user)
         {
+           
             string role = GetRoleName(user.RoleId);
 
-            Claim[] claims = new[]
-         {
+            List<Claim> claims = new List<Claim> {
                  new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                  new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
                  new Claim(JwtRegisteredClaimNames.Name, user.username),
                  new Claim("Role", role.ToString()),
                  new Claim(type:"Date", DateTime.Now.ToString())
             };
+            foreach (var temp in _repo.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, temp.RoleName));
+            }
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
