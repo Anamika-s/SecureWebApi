@@ -12,7 +12,11 @@ namespace SecureWebApi.Context
 
         public DbSet<Student> Students { get; set; }
         public DbSet<User> Uers { get; set; }
-
+        public DbSet<Role> Roles { get; set; }
+        // we can override ef conventions in 2 ways
+        // 1. use data annotations
+        // 2. use fluent api > use OnModelCreating()
+        //fluent api
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Role>().

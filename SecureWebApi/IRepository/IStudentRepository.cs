@@ -9,5 +9,7 @@ namespace SecureWebApi.IRepository
         public Student AddStudent(Student student);
         public bool UpdateStudent(int id, Student student);
         public bool DeleteStudent(int id);
+
+        public string GetRoleName(int roleId);
     }
 }

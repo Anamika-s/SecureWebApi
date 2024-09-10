@@ -47,6 +47,17 @@ namespace WebApiUsingRepoPattern.Repository
             return temp;
         }
 
+
+        public string GetRoleName(int roleId)
+        {
+            string temp =  
+                (from x in _context.Roles
+                 where x.RoleId == roleId
+                 select x.RoleName).ToString();
+            
+            return temp;
+        }
+
         public List<Student> GetStudents()
         {
            return   _context.Students.ToList();

@@ -44,6 +44,14 @@ options.TokenValidationParameters = new TokenValidationParameters
   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
 };
 });
+            builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
+
 
             var app = builder.Build();
 
@@ -53,7 +61,7 @@ options.TokenValidationParameters = new TokenValidationParameters
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("MyPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
 

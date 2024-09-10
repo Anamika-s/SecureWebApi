@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SecureWebApi.Context;
 using SecureWebApi.Models;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 
 namespace SecureWebApi.Controllers
@@ -19,6 +20,8 @@ namespace SecureWebApi.Controllers
         {
             _repo = repo;
             _config = config;
+
+
         }
         //[HttpPost]
         //public IActionResult Login(User user)
@@ -42,7 +45,7 @@ namespace SecureWebApi.Controllers
             var obj = Authenticate(user);
             if (obj != null)
             {
-                var tokenString = GenerateJSONWebToken(user);
+                var tokenString = GenerateJSONWebToken(obj);
                 response = Ok(new { token = tokenString });
             }
             return response;
@@ -50,15 +53,33 @@ namespace SecureWebApi.Controllers
 
         }
 
+        private string GetRoleName(int roleId)
+        {
+            string roleName = ( from x in _repo.Roles
+                                where x.RoleId==roleId
+                                select x.RoleName).FirstOrDefault();
+            return roleName;
+        }
 
         private string GenerateJSONWebToken(User user)
         {
+            string role = GetRoleName(user.RoleId);
+
+            Claim[] claims = new[]
+         {
+                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                 new Claim(JwtRegisteredClaimNames.Sid, user.Id.ToString()),
+                 new Claim(JwtRegisteredClaimNames.Name, user.username),
+                 new Claim("Role", role.ToString()),
+                 new Claim(type:"Date", DateTime.Now.ToString())
+            };
+
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Audience"],
-              null,
+              claims,
               expires: DateTime.Now.AddMinutes(120),
               signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
