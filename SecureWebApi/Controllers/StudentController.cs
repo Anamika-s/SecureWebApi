@@ -40,7 +40,7 @@ namespace SecureWebApi.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "RequireAdminRole")]
         public IActionResult Edit(int id, Student student)
         {
             return Ok(_repo.UpdateStudent(id, student));
@@ -48,7 +48,8 @@ namespace SecureWebApi.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "RequireManagerOrAdmin")]
+        //[Authorize(Roles ="Admin")]
         public IActionResult Post(Student student)
         {
             _repo.AddStudent(student);

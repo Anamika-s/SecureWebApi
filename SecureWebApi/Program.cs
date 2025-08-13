@@ -51,7 +51,12 @@ options.TokenValidationParameters = new TokenValidationParameters
                        .AllowAnyHeader();
             }));
 
-
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("RequireManagerOrAdmin", policy => policy.RequireRole("Admin", "Moderator"));
+            });
+            //builder.Services.AddSession();
 
             var app = builder.Build();
 
@@ -62,7 +67,10 @@ options.TokenValidationParameters = new TokenValidationParameters
                 app.UseSwaggerUI();
             }
             app.UseCors("MyPolicy");
+            //app.UseSession();
+            
             app.UseAuthentication();
+
             app.UseAuthorization();
 
 
